@@ -2,13 +2,13 @@
 import type { BackupDataParts } from './dataManager';
 
 const FILES = {
-    CHATS: '/OmniAI_Sync_Chats.json',
-    CHARACTERS: '/OmniAI_Sync_Characters.json',
-    MEMORIES: '/OmniAI_Sync_Memories.json',
-    LOREBOOKS: '/OmniAI_Sync_Lorebooks.json',
-    SYSTEM: '/OmniAI_Sync_System.json',
-    IMAGES: '/OmniAI_Sync_Images.json',
-    LEGACY_DATA: '/OmniAI_Sync_Data.json'
+    CHATS: '/OmniRPG_Sync_Chats.json',
+    CHARACTERS: '/OmniRPG_Sync_Characters.json',
+    MEMORIES: '/OmniRPG_Sync_Memories.json',
+    LOREBOOKS: '/OmniRPG_Sync_Lorebooks.json',
+    WORLDS: '/OmniRPG_Sync_Worlds.json',
+    SYSTEM: '/OmniRPG_Sync_System.json',
+    IMAGES: '/OmniRPG_Sync_Images.json',
 };
 
 interface DropboxCredentials {
@@ -126,6 +126,7 @@ export const uploadBackupToDropbox = async (
         { path: FILES.CHARACTERS, data: dataParts.characters, name: 'Characters' },
         { path: FILES.MEMORIES, data: dataParts.memories, name: 'Memories' },
         { path: FILES.LOREBOOKS, data: dataParts.lorebooks, name: 'Lorebooks' },
+        { path: FILES.WORLDS, data: dataParts.worlds, name: 'Worlds & Saves' },
         { path: FILES.SYSTEM, data: dataParts.system, name: 'System Settings' },
     ];
     
@@ -149,32 +150,24 @@ export const uploadBackupToDropbox = async (
 };
 
 export const downloadBackupFromDropbox = async (creds: DropboxCredentials): Promise<{ textData: string; imageData: string; }> => {
-    // Try to download the System file first to detect if we are using the new format
+    // Only attempt to download the current version files
     const systemJson = await downloadFile(FILES.SYSTEM, creds);
 
-    // If System file is empty/missing, fallback to legacy monolithic data file
     if (systemJson === '{}') {
-        console.log("New format not found, attempting legacy download...");
-        const oldData = await downloadFile(FILES.LEGACY_DATA, creds);
-        if (oldData === '{}') {
-             return { textData: "{}", imageData: "{}" }; // Nothing found
-        }
-        const oldImages = await downloadFile(FILES.IMAGES, creds);
-        return { textData: oldData, imageData: oldImages };
+        return { textData: "{}", imageData: "{}" }; // Nothing found
     }
 
-    // If System file exists, download the rest of the split files
-    const [chats, chars, mems, lores, imgs] = await Promise.all([
+    const [chats, chars, mems, lores, worlds, imgs] = await Promise.all([
         downloadFile(FILES.CHATS, creds),
         downloadFile(FILES.CHARACTERS, creds),
         downloadFile(FILES.MEMORIES, creds),
         downloadFile(FILES.LOREBOOKS, creds),
+        downloadFile(FILES.WORLDS, creds),
         downloadFile(FILES.IMAGES, creds),
     ]);
 
-    // Merge text parts back into one structure for importBackupData
     const merged = { localStorage: {}, indexedDB: {} };
-    const parts = [chats, chars, mems, lores, systemJson].map(p => JSON.parse(p));
+    const parts = [chats, chars, mems, lores, worlds, systemJson].map(p => JSON.parse(p));
 
     parts.forEach(part => {
         if (part.localStorage) Object.assign(merged.localStorage, part.localStorage);
@@ -185,12 +178,5 @@ export const downloadBackupFromDropbox = async (creds: DropboxCredentials): Prom
 };
 
 export const getDropboxMetadata = async (creds: DropboxCredentials): Promise<{ server_modified: string } | null> => {
-    // We use the System file as the primary indicator of the last sync time for the new format.
-    const systemMeta = await getFileMetadata(FILES.SYSTEM, creds);
-    
-    // If System file exists, return its metadata
-    if (systemMeta) return systemMeta;
-
-    // Fallback: Check for legacy data file
-    return await getFileMetadata(FILES.LEGACY_DATA, creds);
+    return await getFileMetadata(FILES.SYSTEM, creds);
 };

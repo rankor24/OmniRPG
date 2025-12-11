@@ -119,7 +119,7 @@ const ChatToolbar: React.FC<ChatToolbarProps> = (props) => {
             onClick={onMemoryModalOpen}
             aria-label="View Conversation Memories"
             title={
-                reflectionStatus === 'reflecting' ? "OmniAI is reflecting..." :
+                reflectionStatus === 'reflecting' ? "OmniRPG is reflecting..." :
                 reflectionStatus === 'success' ? "Reflection successful" :
                 reflectionStatus === 'error' ? "Reflection failed" : "Memory Cortex"
             }
@@ -153,9 +153,9 @@ const ChatToolbar: React.FC<ChatToolbarProps> = (props) => {
         </button>
         <button
           onClick={() => setShowCharacterStatus(prev => !prev)}
-          aria-label={isRoleplaying ? "Toggle Character Status Visibility" : "Toggle OmniAI Status Visibility"}
+          aria-label={isRoleplaying ? "Toggle Character Status Visibility" : "Toggle OmniRPG Status Visibility"}
           aria-pressed={showCharacterStatus}
-          title={isRoleplaying ? "Character Status" : "OmniAI Status"}
+          title={isRoleplaying ? "Character Status" : "OmniRPG Status"}
           className={`p-2 rounded-full transition-all transform hover:scale-105 active:scale-95 btn-boop ${
             showCharacterStatus ? 'bg-accent text-primary' : 'bg-tertiary text-text-secondary hover:bg-tertiary/80 hover:text-text-primary'
           }`}

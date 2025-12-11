@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { AppSettings } from '../types';
 import { SendIcon, XIcon } from '../icons';
@@ -33,7 +34,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const canSend = !isLoading && (userInput.trim() || images.length > 0);
   
   const getPlaceholderText = () => {
-      if (isEditorMode) return "Ask OmniAI to edit app data...";
+      if (isEditorMode) return "Ask OmniRPG to edit app data...";
       return `Message ${chatPartnerName}...`;
   };
 

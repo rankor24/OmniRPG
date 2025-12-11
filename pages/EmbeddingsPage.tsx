@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
 import * as embeddingService from '../services/embeddingService';
-import type { Memory, Character, Lorebook, StylePreference, LorebookEntry } from '../types';
+import type { Memory, Character, Lorebook, StylePreference } from '../types';
 import { WrenchScrewdriverIcon, NetworkIcon } from '../components/icons';
 import MemoryGraph from '../components/MemoryGraph';
-import { get, set } from 'idb-keyval';
+import { set } from 'idb-keyval';
 
-
+// Helper Components
 const TabButton: React.FC<{
     isActive: boolean;
     onClick: () => void;
@@ -25,7 +24,6 @@ const TabButton: React.FC<{
     </button>
 );
 
-
 const DataSummary: React.FC<{ title: string; total: number; embedded: number }> = ({ title, total, embedded }) => {
     const percentage = total > 0 ? (embedded / total) * 100 : 0;
     return (
@@ -41,6 +39,18 @@ const DataSummary: React.FC<{ title: string; total: number; embedded: number }> 
         </div>
     );
 };
+
+const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode, open?: boolean }> = ({ title, children, open }) => (
+    <details className='bg-secondary rounded-lg border border-tertiary open:border-accent' open={open}>
+      <summary className="p-3 cursor-pointer font-semibold text-text-primary list-none flex justify-between items-center hover:bg-tertiary/50">
+        {title}
+        <span className="text-accent transform transition-transform duration-200 detail-arrow">▼</span>
+      </summary>
+      <div className="p-3 border-t border-tertiary space-y-2">
+        {children}
+      </div>
+    </details>
+);
 
 const EmbeddingSection: React.FC<{ title: string, onGenerate: () => void, isEmbedding: boolean, progress: {current: number, total: number}, message: string | null, modelReady: boolean }> = ({ title, onGenerate, isEmbedding, progress, message, modelReady }) => (
     <CollapsibleSection title={title} open={true}>
@@ -72,63 +82,15 @@ const EmbeddingSection: React.FC<{ title: string, onGenerate: () => void, isEmbe
     </CollapsibleSection>
 );
 
-const CollapsibleSection: React.FC<{ title: string; children: React.ReactNode, open?: boolean }> = ({ title, children, open }) => (
-    <details className='bg-secondary rounded-lg border border-tertiary open:border-accent' open={open}>
-      <summary className="p-3 cursor-pointer font-semibold text-text-primary list-none flex justify-between items-center hover:bg-tertiary/50">
-        {title}
-        <span className="text-accent transform transition-transform duration-200 detail-arrow">▼</span>
-      </summary>
-      <div className="p-3 border-t border-tertiary space-y-2">
-        {children}
-      </div>
-    </details>
-);
-
-const MaintenanceView: React.FC<{
-    summaryStats: any;
-    embeddingStatus: embeddingService.Status;
-    embeddingError: string | null;
-    handleInitializeEmbedding: () => void;
-    handleGenerateAll: () => void;
-    isGeneratingAll: boolean;
-    generateAllMessage: string | null;
-    isAnyEmbedding: boolean;
-    handleGenerateMemoryEmbeddings: () => void;
-    isMemEmbedding: boolean;
-    memEmbeddingProgress: { current: number; total: number };
-    memEmbeddingMessage: string | null;
-    handleGenerateCharacterEmbeddings: () => void;
-    isCharEmbedding: boolean;
-    charEmbeddingProgress: { current: number; total: number };
-    charEmbeddingMessage: string | null;
-    handleGenerateLorebookEmbeddings: () => void;
-    isLoreEmbedding: boolean;
-    loreEmbeddingProgress: { current: number; total: number };
-    loreEmbeddingMessage: string | null;
-    handleGenerateStyleEmbeddings: () => void;
-    isStyleEmbedding: boolean;
-    styleEmbeddingProgress: { current: number; total: number };
-    styleEmbeddingMessage: string | null;
-}> = (props) => {
+// Maintenance View Component
+const MaintenanceView: React.FC<any> = (props) => {
     const {
         summaryStats, embeddingStatus, embeddingError, handleInitializeEmbedding,
-        handleGenerateAll, isGeneratingAll, generateAllMessage, isAnyEmbedding,
-        handleGenerateMemoryEmbeddings,
-        isMemEmbedding,
-        memEmbeddingProgress,
-        memEmbeddingMessage,
-        handleGenerateCharacterEmbeddings,
-        isCharEmbedding,
-        charEmbeddingProgress,
-        charEmbeddingMessage,
-        handleGenerateLorebookEmbeddings,
-        isLoreEmbedding,
-        loreEmbeddingProgress,
-        loreEmbeddingMessage,
-        handleGenerateStyleEmbeddings,
-        isStyleEmbedding,
-        styleEmbeddingProgress,
-        styleEmbeddingMessage,
+        handleGenerateAll, isGeneratingAll, generateAllMessage, 
+        handleGenerateMemoryEmbeddings, isMemEmbedding, memEmbeddingProgress, memEmbeddingMessage,
+        handleGenerateCharacterEmbeddings, isCharEmbedding, charEmbeddingProgress, charEmbeddingMessage,
+        handleGenerateLorebookEmbeddings, isLoreEmbedding, loreEmbeddingProgress, loreEmbeddingMessage,
+        handleGenerateStyleEmbeddings, isStyleEmbedding, styleEmbeddingProgress, styleEmbeddingMessage,
     } = props;
 
     return (
@@ -173,51 +135,48 @@ const MaintenanceView: React.FC<{
                 ) : (
                     <button
                         onClick={handleGenerateAll}
-                        disabled={embeddingStatus !== 'ready' || isAnyEmbedding}
+                        disabled={embeddingStatus !== 'ready'}
                         className="mt-2 py-2 px-4 rounded-md text-sm font-medium text-primary bg-accent hover:bg-accent-hover disabled:bg-secondary disabled:text-text-secondary disabled:cursor-not-allowed btn-boop"
                     >
                         Generate All Embeddings
                     </button>
                 )}
-                {generateAllMessage && !isGeneratingAll && (
-                    <p className={`text-sm mt-2 ${generateAllMessage.startsWith('Error:') ? 'text-danger' : 'text-green-400'}`}>
-                        {generateAllMessage}
-                    </p>
-                )}
             </CollapsibleSection>
 
-            <EmbeddingSection 
-                title="Memory Embeddings"
-                onGenerate={handleGenerateMemoryEmbeddings}
-                isEmbedding={isMemEmbedding}
-                progress={memEmbeddingProgress}
-                message={memEmbeddingMessage}
-                modelReady={embeddingStatus === 'ready'}
-            />
-            <EmbeddingSection 
-                title="Character Embeddings"
-                onGenerate={handleGenerateCharacterEmbeddings}
-                isEmbedding={isCharEmbedding}
-                progress={charEmbeddingProgress}
-                message={charEmbeddingMessage}
-                modelReady={embeddingStatus === 'ready'}
-            />
-            <EmbeddingSection 
-                title="Lorebook Entry Embeddings"
-                onGenerate={handleGenerateLorebookEmbeddings}
-                isEmbedding={isLoreEmbedding}
-                progress={loreEmbeddingProgress}
-                message={loreEmbeddingMessage}
-                modelReady={embeddingStatus === 'ready'}
-            />
-             <EmbeddingSection 
-                title="Style Preference Embeddings"
-                onGenerate={handleGenerateStyleEmbeddings}
-                isEmbedding={isStyleEmbedding}
-                progress={styleEmbeddingProgress}
-                message={styleEmbeddingMessage}
-                modelReady={embeddingStatus === 'ready'}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <EmbeddingSection 
+                    title="Memories" 
+                    onGenerate={handleGenerateMemoryEmbeddings} 
+                    isEmbedding={isMemEmbedding} 
+                    progress={memEmbeddingProgress} 
+                    message={memEmbeddingMessage} 
+                    modelReady={embeddingStatus === 'ready'}
+                />
+                <EmbeddingSection 
+                    title="Characters" 
+                    onGenerate={handleGenerateCharacterEmbeddings} 
+                    isEmbedding={isCharEmbedding} 
+                    progress={charEmbeddingProgress} 
+                    message={charEmbeddingMessage} 
+                    modelReady={embeddingStatus === 'ready'}
+                />
+                <EmbeddingSection 
+                    title="Lorebook Entries" 
+                    onGenerate={handleGenerateLorebookEmbeddings} 
+                    isEmbedding={isLoreEmbedding} 
+                    progress={loreEmbeddingProgress} 
+                    message={loreEmbeddingMessage} 
+                    modelReady={embeddingStatus === 'ready'}
+                />
+                <EmbeddingSection 
+                    title="Style Preferences" 
+                    onGenerate={handleGenerateStyleEmbeddings} 
+                    isEmbedding={isStyleEmbedding} 
+                    progress={styleEmbeddingProgress} 
+                    message={styleEmbeddingMessage} 
+                    modelReady={embeddingStatus === 'ready'}
+                />
+            </div>
         </div>
     );
 };
@@ -233,427 +192,277 @@ interface EmbeddingsPageProps {
   setAllMemories: React.Dispatch<React.SetStateAction<Memory[]>>;
 }
 
-const EmbeddingsPage: React.FC<EmbeddingsPageProps> = ({
-  characters, setCharacters,
-  lorebooks, setLorebooks,
-  stylePreferences, setStylePreferences,
-  allMemories, setAllMemories
-}) => {
-    const [activeTab, setActiveTab] = useState<'graph' | 'maintenance'>('graph');
+const EmbeddingsPage: React.FC<EmbeddingsPageProps> = (props) => {
+    const { 
+        characters, setCharacters, 
+        lorebooks, setLorebooks, 
+        stylePreferences, setStylePreferences, 
+        allMemories, setAllMemories 
+    } = props;
 
-    // Embedding model state
+    const [activeTab, setActiveTab] = useState<'maintenance' | 'graph'>('maintenance');
     const [embeddingStatus, setEmbeddingStatus] = useState<embeddingService.Status>(embeddingService.getEmbeddingStatus());
     const [embeddingError, setEmbeddingError] = useState<string | null>(embeddingService.getEmbeddingError());
-    
-    // State for "Generate All"
-    const [isGeneratingAll, setIsGeneratingAll] = useState(false);
-    const [generateAllMessage, setGenerateAllMessage] = useState<string | null>(null);
 
-    // State for memory embedding
+    // Embedding Progress States
     const [isMemEmbedding, setIsMemEmbedding] = useState(false);
     const [memEmbeddingProgress, setMemEmbeddingProgress] = useState({ current: 0, total: 0 });
     const [memEmbeddingMessage, setMemEmbeddingMessage] = useState<string | null>(null);
 
-    // State for character embedding
     const [isCharEmbedding, setIsCharEmbedding] = useState(false);
     const [charEmbeddingProgress, setCharEmbeddingProgress] = useState({ current: 0, total: 0 });
     const [charEmbeddingMessage, setCharEmbeddingMessage] = useState<string | null>(null);
 
-    // State for lorebook embedding
     const [isLoreEmbedding, setIsLoreEmbedding] = useState(false);
     const [loreEmbeddingProgress, setLoreEmbeddingProgress] = useState({ current: 0, total: 0 });
     const [loreEmbeddingMessage, setLoreEmbeddingMessage] = useState<string | null>(null);
 
-    // State for style embedding
     const [isStyleEmbedding, setIsStyleEmbedding] = useState(false);
     const [styleEmbeddingProgress, setStyleEmbeddingProgress] = useState({ current: 0, total: 0 });
     const [styleEmbeddingMessage, setStyleEmbeddingMessage] = useState<string | null>(null);
 
-    const isAnyEmbedding = isMemEmbedding || isCharEmbedding || isLoreEmbedding || isStyleEmbedding || isGeneratingAll;
+    const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+    const [generateAllMessage, setGenerateAllMessage] = useState<string | null>(null);
 
+    // Initialize/Check Model
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setEmbeddingStatus(embeddingService.getEmbeddingStatus());
+            setEmbeddingError(embeddingService.getEmbeddingError());
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
-    const handleInitializeEmbedding = useCallback(async () => {
-        setEmbeddingStatus('loading');
-        setEmbeddingError(null);
+    const handleInitializeEmbedding = async () => {
         try {
             await embeddingService.initialize();
-            setEmbeddingStatus('ready');
-        } catch (err) {
-            setEmbeddingStatus('error');
-            setEmbeddingError(err instanceof Error ? err.message : 'Unknown error');
+        } catch (e) {
+            console.error("Initialization failed", e);
         }
-    }, []);
+    };
 
-    const generateEmbeddings = useCallback(async <T extends { id: string; summary?: string; embedding?: number[]; [key: string]: any }>(
-        items: T[], 
-        contentKey: keyof T, 
-        updateFunc: (items: T[]) => void,
-        setIsEmbedding: (is: boolean) => void,
-        setProgress: React.Dispatch<React.SetStateAction<{ current: number; total: number }>>,
-        setMessage: (m: string | null) => void,
-        itemType: string
-    ) => {
-        setIsEmbedding(true);
-        setMessage(null);
-        const itemsToProcess = items.filter(item => !item.embedding || item.embedding.length === 0);
-        const totalToProcess = itemsToProcess.length;
-
-        if (totalToProcess === 0) {
-            setMessage(`All ${itemType} items are already embedded.`);
-            setIsEmbedding(false);
-            return;
-        }
-
-        setProgress({ current: 0, total: totalToProcess });
-    
-        const CHUNK_SIZE = 10;
-        const newItems = [...items];
-
-        try {
-            for (let i = 0; i < totalToProcess; i += CHUNK_SIZE) {
-                const chunk = itemsToProcess.slice(i, i + CHUNK_SIZE);
-                for (const item of chunk) {
-                    const content = String(item[contentKey] || item['content'] || item['name']); // Fallback content keys
-                    if (content) {
-                        const newEmbedding = await embeddingService.embedText(content);
-                        const originalItemIndex = newItems.findIndex(pi => pi.id === item.id);
-                        if(originalItemIndex > -1) {
-                            newItems[originalItemIndex].embedding = newEmbedding;
-                        }
-                    }
-                    setProgress(prev => ({ ...prev, current: prev.current + 1 }));
-                }
-            }
-            
-            updateFunc(newItems);
-            setMessage(`Successfully generated embeddings for ${totalToProcess} ${itemType} items.`);
-        } catch (err) {
-            const errorMsg = `Error embedding ${itemType}: ${err instanceof Error ? err.message : 'Unknown error'}`;
-            console.error(errorMsg);
-            setMessage(errorMsg);
-            throw err; // Re-throw for sequential runner to catch
-        } finally {
-            setIsEmbedding(false);
-        }
-    }, []);
-    
-    // Specific handlers for each data type
-    const handleGenerateMemoryEmbeddings = useCallback(async () => {
-        setIsMemEmbedding(true);
-        setMemEmbeddingMessage(null);
-        const itemsToProcess = allMemories.filter(item => !item.embedding || item.embedding.length === 0);
-        const totalToProcess = itemsToProcess.length;
-    
-        if (totalToProcess === 0) {
-            setMemEmbeddingMessage(`All memory items are already embedded.`);
-            setIsMemEmbedding(false);
-            return;
-        }
-    
-        setMemEmbeddingProgress({ current: 0, total: totalToProcess });
-    
-        const groupedBySource = itemsToProcess.reduce((acc, mem) => {
-            let key = '';
-            if (mem.scope === 'global') key = 'global_memories';
-            else if (mem.scope === 'character' && mem.characterId) key = `memories_character_${mem.characterId}`;
-            else if (mem.scope === 'conversation' && mem.conversationId) key = `memories_conversation_${mem.conversationId}`;
-            
-            if (key) {
-                if (!acc[key]) acc[key] = [];
-                acc[key].push(mem);
-            }
-            return acc;
-        }, {} as Record<string, Memory[]>);
-    
-        const newlyEmbeddedMemories: Memory[] = [];
-    
-        try {
-            for (const key of Object.keys(groupedBySource)) {
-                const memoriesToEmbed = groupedBySource[key];
-                const originalMemories = await get<Memory[]>(key) || [];
-                const originalMap = new Map(originalMemories.map(m => [m.id, m]));
-    
-                for (const mem of memoriesToEmbed) {
-                    const content = String(mem.content);
-                    if (content) {
-                        const newEmbedding = await embeddingService.embedText(content);
-                        const updatedMem = { ...mem, embedding: newEmbedding };
-                        originalMap.set(mem.id, updatedMem);
-                        newlyEmbeddedMemories.push(updatedMem);
-                    }
-                    setMemEmbeddingProgress(prev => ({ ...prev, current: prev.current + 1 }));
-                }
-                await set(key, Array.from(originalMap.values()));
-            }
-    
-            setAllMemories(prev => {
-                const updatedMap = new Map(prev.map(m => [m.id, m]));
-                newlyEmbeddedMemories.forEach(mem => updatedMap.set(mem.id, mem));
-                return Array.from(updatedMap.values());
-            });
-    
-            setMemEmbeddingMessage(`Successfully generated embeddings for ${totalToProcess} memory items.`);
-        } catch (err) {
-            const errorMsg = `Error embedding memories: ${err instanceof Error ? err.message : 'Unknown error'}`;
-            console.error(errorMsg);
-            setMemEmbeddingMessage(errorMsg);
-            throw err;
-        } finally {
-            setIsMemEmbedding(false);
-        }
-    }, [allMemories, setAllMemories]);
-    
-    const handleGenerateCharacterEmbeddings = useCallback(async () => {
-        await generateEmbeddings(
-            characters.filter(c => c.id !== 'omni-ai'),
-            'personality',
-            (updatedChars) => setCharacters(prev => [...prev.filter(c => c.id === 'omni-ai'), ...updatedChars]),
-            setIsCharEmbedding,
-            setCharEmbeddingProgress,
-            setCharEmbeddingMessage,
-            'character'
-        );
-    }, [characters, setCharacters, generateEmbeddings]);
-
-    const handleGenerateLorebookEmbeddings = useCallback(async () => {
-        const allEntries: (LorebookEntry & { lorebookId: string })[] = lorebooks.flatMap(lb => lb.entries.map(e => ({ ...e, lorebookId: lb.id })));
-        
-        setIsLoreEmbedding(true);
-        setLoreEmbeddingMessage(null);
-        let processedCount = 0;
-        const itemsToProcess = allEntries.filter(item => !item.embedding || item.embedding.length === 0);
-        const totalToProcess = itemsToProcess.length;
-
-        if (totalToProcess === 0) {
-            setLoreEmbeddingMessage(`All lorebook entries are already embedded.`);
-            setIsLoreEmbedding(false);
-            return;
-        }
-
-        setLoreEmbeddingProgress({ current: 0, total: totalToProcess });
-
-        try {
-            let updatedLorebooks = JSON.parse(JSON.stringify(lorebooks));
-            const CHUNK_SIZE = 10;
-            for (let i = 0; i < totalToProcess; i += CHUNK_SIZE) {
-                const chunk = itemsToProcess.slice(i, i + CHUNK_SIZE);
-
-                for (const entry of chunk) {
-                    const content = String(entry.content);
-                    if (content) {
-                        entry.embedding = await embeddingService.embedText(content);
-                    }
-                    processedCount++;
-                    setLoreEmbeddingProgress({ current: processedCount, total: totalToProcess });
-                }
-
-                chunk.forEach(updatedEntry => {
-                    const lbIndex = updatedLorebooks.findIndex((lb: Lorebook) => lb.id === updatedEntry.lorebookId);
-                    if (lbIndex !== -1) {
-                        const entryIndex = updatedLorebooks[lbIndex].entries.findIndex((e: LorebookEntry) => e.id === updatedEntry.id);
-                        if (entryIndex !== -1) {
-                            updatedLorebooks[lbIndex].entries[entryIndex].embedding = updatedEntry.embedding;
-                        }
-                    }
-                });
-            }
-            setLorebooks(updatedLorebooks);
-            setLoreEmbeddingMessage(`Successfully generated embeddings for ${totalToProcess} lorebook entries.`);
-        } catch (err) {
-            const errorMsg = `Error embedding lorebook entries: ${err instanceof Error ? err.message : 'Unknown error'}`;
-            console.error(errorMsg);
-            setLoreEmbeddingMessage(errorMsg);
-            throw err;
-        } finally {
-            setIsLoreEmbedding(false);
-        }
-    }, [lorebooks, setLorebooks]);
-
-    const handleGenerateStyleEmbeddings = useCallback(async () => {
-        await generateEmbeddings(
-            stylePreferences,
-            'content',
-            setStylePreferences,
-            setIsStyleEmbedding,
-            setStyleEmbeddingProgress,
-            setStyleEmbeddingMessage,
-            'style preference'
-        );
-    }, [stylePreferences, setStylePreferences, generateEmbeddings]);
-
-    const handleGenerateAll = useCallback(async () => {
-        if (embeddingStatus !== 'ready') {
-            alert("Please initialize the embedding model first.");
-            return;
-        }
-        if (isAnyEmbedding) {
-            alert("An embedding process is already running.");
-            return;
-        }
-        if (!window.confirm("This will generate embeddings for all data types sequentially. This may take several minutes. Continue?")) {
-            return;
-        }
-    
-        setIsGeneratingAll(true);
-        setGenerateAllMessage('Starting sequential embedding process...');
-    
-        try {
-            setGenerateAllMessage('Generating memory embeddings...');
-            await handleGenerateMemoryEmbeddings();
-            
-            setGenerateAllMessage('Generating character embeddings...');
-            await handleGenerateCharacterEmbeddings();
-            
-            setGenerateAllMessage('Generating lorebook entry embeddings...');
-            await handleGenerateLorebookEmbeddings();
-    
-            setGenerateAllMessage('Generating style preference embeddings...');
-            await handleGenerateStyleEmbeddings();
-            
-            setGenerateAllMessage('All embeddings generated successfully!');
-        } catch (error) {
-            const errorMsg = `An error occurred during the 'Generate All' process: ${error instanceof Error ? error.message : 'Unknown error'}`;
-            console.error(errorMsg);
-            setGenerateAllMessage(errorMsg);
-        } finally {
-            setTimeout(() => {
-                setIsGeneratingAll(false);
-                setGenerateAllMessage(null);
-            }, 5000);
-        }
-    }, [embeddingStatus, isAnyEmbedding, handleGenerateMemoryEmbeddings, handleGenerateCharacterEmbeddings, handleGenerateLorebookEmbeddings, handleGenerateStyleEmbeddings]);
-
+    // --- Stats Calculation ---
     const summaryStats = useMemo(() => {
-        const countEmbedded = (items: any[]) => items.filter(item => item.embedding && item.embedding.length > 0).length;
-        const countLorebookEntries = (lbs: Lorebook[]) => lbs.reduce((acc, lb) => acc + lb.entries.length, 0);
-        const countEmbeddedLorebookEntries = (lbs: Lorebook[]) => lbs.reduce((acc, lb) => acc + lb.entries.filter(e => e.embedding && e.embedding.length > 0).length, 0);
-
+        const loreEntries = lorebooks.flatMap(lb => lb.entries);
         return {
-            memories: { total: allMemories.length, embedded: countEmbedded(allMemories) },
-            characters: { total: characters.filter(c => c.id !== 'omni-ai').length, embedded: countEmbedded(characters) },
-            lorebooks: { total: countLorebookEntries(lorebooks), embedded: countEmbeddedLorebookEntries(lorebooks) },
-            styles: { total: stylePreferences.length, embedded: countEmbedded(stylePreferences) }
+            memories: { total: allMemories.length, embedded: allMemories.filter(m => m.embedding && m.embedding.length > 0).length },
+            characters: { total: characters.length, embedded: characters.filter(c => c.embedding && c.embedding.length > 0).length },
+            lorebooks: { total: loreEntries.length, embedded: loreEntries.filter(e => e.embedding && e.embedding.length > 0).length },
+            styles: { total: stylePreferences.length, embedded: stylePreferences.filter(s => s.embedding && s.embedding.length > 0).length },
         };
     }, [allMemories, characters, lorebooks, stylePreferences]);
-    
-    const [similarityThreshold, setSimilarityThreshold] = useState(0.75);
-    const [repelForce, setRepelForce] = useState(-50);
-    const [linkDistance, setLinkDistance] = useState(30);
+
+    // --- Generators ---
+
+    const generateForItems = async <T extends { id: string, content?: string, embedding?: number[] }>(
+        items: T[],
+        updateFn: (items: T[]) => void,
+        contentFn: (item: T) => string,
+        progressFn: (current: number, total: number) => void,
+        idbKey?: string
+    ) => {
+        const total = items.length;
+        let current = 0;
+        const newItems = [...items];
+        
+        for (let i = 0; i < total; i++) {
+            const item = newItems[i];
+            const text = contentFn(item);
+            if (text && (!item.embedding || item.embedding.length === 0)) {
+                try {
+                    const embedding = await embeddingService.embedText(text);
+                    newItems[i] = { ...item, embedding };
+                } catch (e) {
+                    console.error("Embedding generation error for item", item.id, e);
+                }
+            }
+            current++;
+            progressFn(current, total);
+            // Batch update every 10 items or at the end
+            if (current % 10 === 0 || current === total) {
+                updateFn([...newItems]);
+                await new Promise(resolve => setTimeout(resolve, 0)); // Yield to UI
+            }
+        }
+        return newItems;
+    };
+
+    const handleGenerateMemoryEmbeddings = async () => {
+        setIsMemEmbedding(true);
+        setMemEmbeddingMessage("Generating memory embeddings...");
+        try {
+            await generateForItems(
+                allMemories,
+                setAllMemories,
+                (m) => m.content,
+                (c, t) => setMemEmbeddingProgress({ current: c, total: t })
+            );
+            // Save globals as a best effort
+            const globalMems = allMemories.filter(m => m.scope === 'global');
+            await set('global_memories', globalMems);
+            setMemEmbeddingMessage("Completed!");
+        } catch (e) {
+            setMemEmbeddingMessage("Error generating embeddings.");
+        } finally {
+            setIsMemEmbedding(false);
+        }
+    };
+
+    const handleGenerateCharacterEmbeddings = async () => {
+        setIsCharEmbedding(true);
+        setCharEmbeddingMessage("Generating character embeddings...");
+        try {
+            const updatedChars = await generateForItems(
+                characters,
+                setCharacters,
+                (c) => `${c.name} ${c.tagline} ${c.core} ${c.personality}`,
+                (c, t) => setCharEmbeddingProgress({ current: c, total: t })
+            );
+            await set('characters', updatedChars);
+            setCharEmbeddingMessage("Completed!");
+        } catch (e) {
+            setCharEmbeddingMessage("Error generating embeddings.");
+        } finally {
+            setIsCharEmbedding(false);
+        }
+    };
+
+    const handleGenerateLorebookEmbeddings = async () => {
+        setIsLoreEmbedding(true);
+        setLoreEmbeddingMessage("Generating lorebook embeddings...");
+        try {
+            const newLorebooks = [...lorebooks];
+            let totalEntries = 0;
+            newLorebooks.forEach(lb => totalEntries += lb.entries.length);
+            let processed = 0;
+
+            for (let i = 0; i < newLorebooks.length; i++) {
+                const lb = newLorebooks[i];
+                const newEntries = [...lb.entries];
+                for (let j = 0; j < newEntries.length; j++) {
+                    const entry = newEntries[j];
+                    if (!entry.embedding || entry.embedding.length === 0) {
+                        try {
+                            const embedding = await embeddingService.embedText(`${entry.keywords.join(', ')} ${entry.content}`);
+                            newEntries[j] = { ...entry, embedding };
+                        } catch (e) { console.error(e); }
+                    }
+                    processed++;
+                    setLoreEmbeddingProgress({ current: processed, total: totalEntries });
+                    if (processed % 5 === 0) await new Promise(r => setTimeout(r, 0));
+                }
+                newLorebooks[i] = { ...lb, entries: newEntries };
+                setLorebooks([...newLorebooks]); // Update state incrementally
+            }
+            await set('lorebooks', newLorebooks);
+            setLoreEmbeddingMessage("Completed!");
+        } catch (e) {
+            setLoreEmbeddingMessage("Error generating embeddings.");
+        } finally {
+            setIsLoreEmbedding(false);
+        }
+    };
+
+    const handleGenerateStyleEmbeddings = async () => {
+        setIsStyleEmbedding(true);
+        setStyleEmbeddingMessage("Generating style embeddings...");
+        try {
+            const updatedStyles = await generateForItems(
+                stylePreferences,
+                setStylePreferences,
+                (s) => s.content,
+                (c, t) => setStyleEmbeddingProgress({ current: c, total: t })
+            );
+            await set('style_preferences', updatedStyles);
+            setStyleEmbeddingMessage("Completed!");
+        } catch (e) {
+            setStyleEmbeddingMessage("Error generating embeddings.");
+        } finally {
+            setIsStyleEmbedding(false);
+        }
+    };
+
+    const handleGenerateAll = async () => {
+        setIsGeneratingAll(true);
+        setGenerateAllMessage("Starting batch generation...");
+        try {
+            await handleGenerateCharacterEmbeddings();
+            await handleGenerateLorebookEmbeddings();
+            await handleGenerateStyleEmbeddings();
+            await handleGenerateMemoryEmbeddings();
+            setGenerateAllMessage("Batch generation complete!");
+        } catch (e) {
+            setGenerateAllMessage("Batch generation finished with errors.");
+        } finally {
+            setIsGeneratingAll(false);
+        }
+    };
 
     return (
         <div className="h-full overflow-y-auto p-4 md:p-6 lg:p-8">
             <header className="mb-8">
-                <h1 className="text-4xl font-bold text-text-primary mb-2">Embedding Space</h1>
-                <p className="text-text-secondary">Visualize the semantic relationships between all data points in OmniAI's memory, and manage the embedding generation process.</p>
+                <h1 className="text-4xl font-bold text-text-primary mb-2">Embeddings & Maintenance</h1>
+                <p className="text-text-secondary">Manage vector embeddings for semantic search and visualize the knowledge graph.</p>
             </header>
 
-            <div className="mb-8 border-b border-tertiary flex">
-                <TabButton isActive={activeTab === 'graph'} onClick={() => setActiveTab('graph')}>
-                    <NetworkIcon className="w-5 h-5"/>
-                    Graph Visualization
-                </TabButton>
+            <div className="mb-6 border-b border-tertiary flex">
                 <TabButton isActive={activeTab === 'maintenance'} onClick={() => setActiveTab('maintenance')}>
-                    <WrenchScrewdriverIcon className="w-5 h-5"/>
-                    Maintenance & Generation
+                    <WrenchScrewdriverIcon className="w-5 h-5" /> Maintenance
+                </TabButton>
+                <TabButton isActive={activeTab === 'graph'} onClick={() => setActiveTab('graph')}>
+                    <NetworkIcon className="w-5 h-5" /> Knowledge Graph
                 </TabButton>
             </div>
 
-            <div className="animate-fade-in">
-                {activeTab === 'graph' && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="p-4 bg-secondary rounded-lg border border-tertiary">
-                                <label htmlFor="similarity-threshold" className="block text-sm font-medium text-text-secondary mb-2">
-                                    Similarity Threshold: <span className="font-bold text-accent">{similarityThreshold.toFixed(2)}</span>
-                                </label>
-                                <input
-                                    id="similarity-threshold"
-                                    type="range"
-                                    min="0.5"
-                                    max="1.0"
-                                    step="0.01"
-                                    value={similarityThreshold}
-                                    onChange={e => setSimilarityThreshold(Number(e.target.value))}
-                                    className="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer accent-accent"
-                                />
-                                <p className="text-xs text-text-secondary opacity-70 mt-1">Minimum similarity to draw a link.</p>
-                            </div>
-                             <div className="p-4 bg-secondary rounded-lg border border-tertiary">
-                                <label htmlFor="repel-force" className="block text-sm font-medium text-text-secondary mb-2">
-                                    Repulsion Force: <span className="font-bold text-accent">{repelForce}</span>
-                                </label>
-                                <input
-                                    id="repel-force"
-                                    type="range"
-                                    min="-200"
-                                    max="-1"
-                                    step="1"
-                                    value={repelForce}
-                                    onChange={e => setRepelForce(Number(e.target.value))}
-                                    className="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer accent-accent"
-                                />
-                                <p className="text-xs text-text-secondary opacity-70 mt-1">How much nodes push each other away.</p>
-                            </div>
-                             <div className="p-4 bg-secondary rounded-lg border border-tertiary">
-                                <label htmlFor="link-distance" className="block text-sm font-medium text-text-secondary mb-2">
-                                    Link Distance: <span className="font-bold text-accent">{linkDistance}</span>
-                                </label>
-                                <input
-                                    id="link-distance"
-                                    type="range"
-                                    min="1"
-                                    max="100"
-                                    step="1"
-                                    value={linkDistance}
-                                    onChange={e => setLinkDistance(Number(e.target.value))}
-                                    className="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer accent-accent"
-                                />
-                                <p className="text-xs text-text-secondary opacity-70 mt-1">The target distance between linked nodes.</p>
-                            </div>
-                        </div>
-                        <MemoryGraph
-                            memories={allMemories}
-                            lorebooks={lorebooks}
-                            characters={characters}
-                            stylePreferences={stylePreferences}
-                            similarityThreshold={similarityThreshold}
-                            repelForce={repelForce}
-                            linkDistance={linkDistance}
-                        />
+            {activeTab === 'maintenance' && (
+                <MaintenanceView 
+                    summaryStats={summaryStats}
+                    embeddingStatus={embeddingStatus}
+                    embeddingError={embeddingError}
+                    handleInitializeEmbedding={handleInitializeEmbedding}
+                    handleGenerateAll={handleGenerateAll}
+                    isGeneratingAll={isGeneratingAll}
+                    generateAllMessage={generateAllMessage}
+                    isAnyEmbedding={isMemEmbedding || isCharEmbedding || isLoreEmbedding || isStyleEmbedding}
+                    handleGenerateMemoryEmbeddings={handleGenerateMemoryEmbeddings}
+                    isMemEmbedding={isMemEmbedding}
+                    memEmbeddingProgress={memEmbeddingProgress}
+                    memEmbeddingMessage={memEmbeddingMessage}
+                    handleGenerateCharacterEmbeddings={handleGenerateCharacterEmbeddings}
+                    isCharEmbedding={isCharEmbedding}
+                    charEmbeddingProgress={charEmbeddingProgress}
+                    charEmbeddingMessage={charEmbeddingMessage}
+                    handleGenerateLorebookEmbeddings={handleGenerateLorebookEmbeddings}
+                    isLoreEmbedding={isLoreEmbedding}
+                    loreEmbeddingProgress={loreEmbeddingProgress}
+                    loreEmbeddingMessage={loreEmbeddingMessage}
+                    handleGenerateStyleEmbeddings={handleGenerateStyleEmbeddings}
+                    isStyleEmbedding={isStyleEmbedding}
+                    styleEmbeddingProgress={styleEmbeddingProgress}
+                    styleEmbeddingMessage={styleEmbeddingMessage}
+                />
+            )}
+
+            {activeTab === 'graph' && (
+                <div className="animate-fade-in">
+                    <div className="mb-4 bg-secondary p-4 rounded-lg border border-tertiary">
+                        <h3 className="text-lg font-semibold text-text-primary mb-2">Knowledge Graph Visualization</h3>
+                        <p className="text-sm text-text-secondary">
+                            Visualizing connections between memories, characters, and lore based on semantic similarity. 
+                            Nodes closer together are more conceptually related.
+                        </p>
                     </div>
-                )}
-                {activeTab === 'maintenance' && (
-                   <MaintenanceView
-                        summaryStats={summaryStats}
-                        embeddingStatus={embeddingStatus}
-                        embeddingError={embeddingError}
-                        handleInitializeEmbedding={handleInitializeEmbedding}
-                        handleGenerateAll={handleGenerateAll}
-                        isGeneratingAll={isGeneratingAll}
-                        generateAllMessage={generateAllMessage}
-                        isAnyEmbedding={isAnyEmbedding}
-                        handleGenerateMemoryEmbeddings={handleGenerateMemoryEmbeddings}
-                        isMemEmbedding={isMemEmbedding}
-                        memEmbeddingProgress={memEmbeddingProgress}
-                        memEmbeddingMessage={memEmbeddingMessage}
-
-                        handleGenerateCharacterEmbeddings={handleGenerateCharacterEmbeddings}
-                        isCharEmbedding={isCharEmbedding}
-                        charEmbeddingProgress={charEmbeddingProgress}
-                        charEmbeddingMessage={charEmbeddingMessage}
-
-                        handleGenerateLorebookEmbeddings={handleGenerateLorebookEmbeddings}
-                        isLoreEmbedding={isLoreEmbedding}
-                        loreEmbeddingProgress={loreEmbeddingProgress}
-                        loreEmbeddingMessage={loreEmbeddingMessage}
-
-                        handleGenerateStyleEmbeddings={handleGenerateStyleEmbeddings}
-                        isStyleEmbedding={isStyleEmbedding}
-                        styleEmbeddingProgress={styleEmbeddingProgress}
-                        styleEmbeddingMessage={styleEmbeddingMessage}
-                   />
-                )}
-            </div>
+                    <MemoryGraph 
+                        memories={allMemories} 
+                        lorebooks={lorebooks} 
+                        characters={characters} 
+                        stylePreferences={stylePreferences}
+                        similarityThreshold={0.5}
+                        repelForce={-100}
+                        linkDistance={50}
+                    />
+                </div>
+            )}
         </div>
     );
 };

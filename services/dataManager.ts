@@ -10,6 +10,7 @@ export interface BackupDataParts {
   characters: string;
   memories: string;
   lorebooks: string;
+  worlds: string;
   system: string;
   images: string | null;
 }
@@ -79,6 +80,7 @@ export const prepareBackupData = async (includeImages: boolean = true, onProgres
         characters: { localStorage: {}, indexedDB: {} },
         memories: { localStorage: {}, indexedDB: {} },
         lorebooks: { localStorage: {}, indexedDB: {} },
+        worlds: { localStorage: {}, indexedDB: {} },
         system: { localStorage: {}, indexedDB: {} },
     };
 
@@ -91,6 +93,7 @@ export const prepareBackupData = async (includeImages: boolean = true, onProgres
         else if (key === 'lorebooks') cat = 'lorebooks';
         else if (key.startsWith('conversations_') || key.startsWith('chatHistory_') || key.startsWith('chatScene_')) cat = 'chats';
         else if (key.startsWith('global_memories') || key.startsWith('memories_') || key === 'style_preferences') cat = 'memories';
+        else if (key.startsWith('world_') || key.startsWith('save_') || key === 'library_items') cat = 'worlds';
         // Everything else (personas, prompts, logs, appSettings) stays in 'system'
         
         categoryMap[cat][source][key] = value;
@@ -156,6 +159,7 @@ export const prepareBackupData = async (includeImages: boolean = true, onProgres
         characters: JSON.stringify(categoryMap.characters, null, 2),
         memories: JSON.stringify(categoryMap.memories, null, 2),
         lorebooks: JSON.stringify(categoryMap.lorebooks, null, 2),
+        worlds: JSON.stringify(categoryMap.worlds, null, 2),
         system: JSON.stringify(categoryMap.system, null, 2),
         images: imageData
     };

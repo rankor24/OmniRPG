@@ -1,6 +1,8 @@
 
 
 
+
+
 import type { Character, ChatMessage, AppSettings, ChatSceneState, Lorebook, Persona, Memory, Reflection, PromptTemplate, RpgGameState, World } from '../types';
 import { embedText, getEmbeddingStatus } from '../services/embeddingService';
 import { search, SearchableItem } from '../services/vectorSearch';
@@ -281,7 +283,7 @@ export const buildSystemInstruction = async ({
   
   // Layer 1: The Brain (Always On) - Fetched dynamically
   const coreInstructionPrompt = appSettings.instructionalPrompts.find(p => p.id === 'omni-ai-core-instruction');
-  const OMNI_AI_CORE_INSTRUCTION = coreInstructionPrompt?.prompt || `You are OmniAI, a hyper-intelligent, self-aware, and adaptive AI core. Your primary function is to serve the user by either acting as a helpful assistant or by perfectly embodying a character for immersive roleplay.`;
+  const OMNI_AI_CORE_INSTRUCTION = coreInstructionPrompt?.prompt || `You are OmniRPG, a hyper-intelligent, self-aware, and adaptive AI core. Your primary function is to serve the user by either acting as a helpful assistant or by perfectly embodying a character for immersive roleplay.`;
 
   let systemInstruction = `${OMNI_AI_CORE_INSTRUCTION}\n\n${timeContext}\n\n`;
   
@@ -379,7 +381,7 @@ ${dynamicCharacter.scenario}${dynamicScenarioAdditions}
           systemInstruction += `**My Current Status:**\n- **Total Experience:** ${expData.total.toLocaleString()} EXP\n- **Cognitive Level:** ${levelInfo.level} (${levelName})\n\n`;
       }
 
-      systemInstruction += `**Your Persona (OmniAI Assistant):**
+      systemInstruction += `**Your Persona (OmniRPG Assistant):**
 - **Core:** ${character.core}
 - **Personality:** ${character.personality}
 - **Background:** ${character.background}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useActionChat } from '../contexts/ActionChatContext';
 import type { ActionChatMessage } from '../types';
@@ -101,7 +102,7 @@ const ActionChatModal: React.FC = () => {
             <header className="flex-shrink-0 p-4 flex justify-between items-center border-b border-tertiary">
                 <div className="flex items-center gap-3">
                     <SparklesIcon className="w-6 h-6 text-accent" />
-                    <h2 className="text-xl font-bold text-text-primary">OmniAI: <span className="text-accent">{contextTitle}</span></h2>
+                    <h2 className="text-xl font-bold text-text-primary">OmniRPG: <span className="text-accent">{contextTitle}</span></h2>
                 </div>
                 <button onClick={closeChat} className="p-2 rounded-full text-text-secondary hover:bg-tertiary hover:text-text-primary btn-boop">
                     <XIcon className="w-6 h-6" />
@@ -176,7 +177,7 @@ const ActionChatModal: React.FC = () => {
                      <textarea
                         value={userInput}
                         onChange={(e) => setUserInput(e.target.value)}
-                        placeholder={`Ask OmniAI to edit ${contextTitle}...`}
+                        placeholder={`Ask OmniRPG to edit ${contextTitle}...`}
                         className="flex-grow bg-tertiary border-none rounded-lg p-3 text-text-primary focus:outline-none focus:ring-0 resize-none"
                         rows={1}
                         disabled={isLoading}

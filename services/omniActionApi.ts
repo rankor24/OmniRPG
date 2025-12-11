@@ -2,6 +2,8 @@
 
 
 
+
+
 import { v4 as uuidv4 } from 'uuid';
 import { get, set, keys as idbKeys } from 'idb-keyval';
 import type { ActionChatMessage, PromptTemplate, Persona, Character, Lorebook, LorebookEntry, Reflection, ReflectionProposal, Conversation, Memory } from '../types';
@@ -472,7 +474,7 @@ const logActionAsReflection = async (
         conversationId: ACTION_CHAT_CONVO_ID,
         conversationPreview: "Action Chat Log",
         characterId: 'omni-ai',
-        characterName: "OmniAI",
+        characterName: "OmniRPG",
         thoughts: thoughts,
         proposals: [proposal],
         timestamp: new Date().toISOString()
@@ -639,7 +641,7 @@ export const executeActionChatProposals = async (
     const model = appSettings.aiModel;
     const tools = getToolsForContext(context);
     
-    let systemPrompt = appSettings.instructionalPrompts.find(p => p.id === 'action-chat-execution-summary-prompt')?.prompt || `You are OmniAI. You have just executed a series of tool calls based on user approval. Now, your task is to provide a final, concise, and friendly confirmation message to the user, summarizing what was done.`;
+    let systemPrompt = appSettings.instructionalPrompts.find(p => p.id === 'action-chat-execution-summary-prompt')?.prompt || `You are OmniRPG. You have just executed a series of tool calls based on user approval. Now, your task is to provide a final, concise, and friendly confirmation message to the user, summarizing what was done.`;
 
     const tool_calls = proposalMessage.toolCallProposals!.tool_calls;
     

@@ -164,7 +164,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   
                   {message.proposals && message.proposals.length > 0 && (
                     <div className={`${hasContent ? 'mt-3 pt-3 border-t border-white/10' : ''} space-y-2`}>
-                      <h4 className="text-xs font-bold text-text-primary/80">OmniAI Suggestions:</h4>
+                      <h4 className="text-xs font-bold text-text-primary/80">OmniRPG Suggestions:</h4>
                       {message.proposals.map(proposal => (
                         <div key={proposal.id} className={`bg-black/20 p-2 rounded-md transition-opacity ${proposal.status !== 'pending' ? 'opacity-60' : ''}`}>
                           <div className="flex justify-between items-start gap-2">

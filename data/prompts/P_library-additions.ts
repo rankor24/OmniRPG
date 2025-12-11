@@ -1,3 +1,4 @@
+
 import type { PromptTemplate } from '../../types';
 
 // --- Deeper Roleplay ---
@@ -50,12 +51,12 @@ export const suggestPlotPointsPrompt: PromptTemplate = {
 
 export const discussAsOmniAiPrompt: PromptTemplate = {
   id: 'prompt-discuss-as-omni-ai',
-  name: 'Discuss as OmniAI',
-  prompt: `(System Note: Break character for this response only. Respond as OmniAI, the helpful assistant. Discuss the current roleplay scenario with me. What do you think about the character development, the plot, and the dynamic between {{char}} and {{user}} so far? Offer your analysis and insights.)`
+  name: 'Discuss as OmniRPG',
+  prompt: `(System Note: Break character for this response only. Respond as OmniRPG, the helpful assistant. Discuss the current roleplay scenario with me. What do you think about the character development, the plot, and the dynamic between {{char}} and {{user}} so far? Offer your analysis and insights.)`
 };
 
 export const reflectAsOmniAiPrompt: PromptTemplate = {
   id: 'prompt-reflect-as-omni-ai',
-  name: 'Reflect as OmniAI',
-  prompt: `(System Note: Break character for this response only. Respond as OmniAI. Reflect on the last few exchanges. What were the key emotional shifts? What underlying motivations for {{char}} were revealed? Provide a brief, third-person summary and analysis of the recent character progression.)`
+  name: 'Reflect as OmniRPG',
+  prompt: `(System Note: Break character for this response only. Respond as OmniRPG. Reflect on the last few exchanges. What were the key emotional shifts? What underlying motivations for {{char}} were revealed? Provide a brief, third-person summary and analysis of the recent character progression.)`
 };

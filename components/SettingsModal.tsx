@@ -4,6 +4,8 @@
 
 
 
+
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import type { AppSettings, AiProvider, Lorebook } from '../types';
 import ToggleSwitch from './ToggleSwitch';
@@ -362,8 +364,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ appSettings, onSaveAppSet
         });
 
         const timestamp = new Date().toISOString().split('T')[0];
-        downloadFile(JSON.stringify(combined, null, 2), `omni-ai-backup_${timestamp}_Data.json`);
-        downloadFile(parts.images || '{}', `omni-ai-backup_${timestamp}_Images.json`);
+        downloadFile(JSON.stringify(combined, null, 2), `omnirpg-backup_${timestamp}_Data.json`);
+        downloadFile(parts.images || '{}', `omnirpg-backup_${timestamp}_Images.json`);
     } catch (e) {
         console.error("Failed to export data:", e);
         alert("An error occurred during data export. Check the console for details.");

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { get, keys as idbKeys } from 'idb-keyval';
 import type { Character, AppSettings, Lorebook, Persona, PromptTemplate, Memory, Reflection, Conversation, ChatMessage, ExpBreakdown, ManualExpLogEntry, ReflectionProposal, RatingExpLogEntry } from '../types';
@@ -154,7 +155,7 @@ const OmniAiDashboardPage: React.FC<OmniAiDashboardPageProps> = (props) => {
   const handleSave = () => {
     if (omniAiCharacter) {
         props.onUpdateOmniAICharacter(omniAiCharacter);
-        alert("OmniAI persona updated!");
+        alert("OmniRPG persona updated!");
     }
   };
   
@@ -190,8 +191,8 @@ const OmniAiDashboardPage: React.FC<OmniAiDashboardPageProps> = (props) => {
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="text-center">
             <OmniEyeLogo className="w-32 h-32 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-text-primary mb-2">OmniAI Command Center</h1>
-            <p className="text-text-secondary">Manage OmniAI's core persona and track its growth.</p>
+            <h1 className="text-4xl font-bold text-text-primary mb-2">OmniRPG Command Center</h1>
+            <p className="text-text-secondary">Manage OmniRPG's core persona and track its growth.</p>
         </header>
 
         <div className="mb-8 border-b border-tertiary flex justify-center">
@@ -247,7 +248,7 @@ const OmniAiDashboardPage: React.FC<OmniAiDashboardPageProps> = (props) => {
         
         {activeTab === 'editor' && (
              <section className="bg-secondary p-6 rounded-lg border border-tertiary shadow-lg animate-fade-in">
-                <h2 className={formSectionTitleClass}>OmniAI Persona Editor</h2>
+                <h2 className={formSectionTitleClass}>OmniRPG Persona Editor</h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <FileUpload label="Character Avatar" currentImage={omniAiCharacter.avatar} onFileUpload={(base64) => setOmniAiCharacter(p => p ? ({...p, avatar: base64}) : null)} sfwMode={props.appSettings.sfwMode} />

@@ -1,6 +1,8 @@
 
 
 
+
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { get, set, keys as idbKeys } from 'idb-keyval';
 import type { Reflection, Character, Lorebook, AppSettings, Persona, PromptTemplate, ReflectionProposal, Conversation, Memory, StylePreference, LorebookEntry, RpgItem, World } from '../types';
@@ -409,7 +411,7 @@ const ReflectionsPage: React.FC<ReflectionsPageProps> = (props) => {
         <header className="mb-8 text-center flex-shrink-0">
           <h1 className="text-4xl font-bold text-text-primary mb-2">Reflections</h1>
           <p className="text-text-secondary">
-            This is OmniAI's cognitive log, where it records its thoughts and proposes self-improvements based on your conversations.
+            This is OmniRPG's cognitive log, where it records its thoughts and proposes self-improvements based on your conversations.
           </p>
         </header>
 
@@ -434,7 +436,7 @@ const ReflectionsPage: React.FC<ReflectionsPageProps> = (props) => {
             <div className="text-center py-12 px-4 border-2 border-dashed border-tertiary rounded-lg">
                 <p className="text-lg text-text-secondary">No reflections have been generated yet.</p>
                 <p className="text-sm text-text-secondary opacity-70 mt-2">
-                    Start a conversation, and OmniAI will begin analyzing interactions here.
+                    Start a conversation, and OmniRPG will begin analyzing interactions here.
                 </p>
             </div>
         ) : (

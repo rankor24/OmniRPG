@@ -1,21 +1,22 @@
 
 
 
+
 import type { Lorebook } from '../../types';
 import { OMNI_AI_MANUAL_LOREBOOK_ID } from '../../ids';
 
 export const omniAiManualLorebook: Lorebook = {
     id: OMNI_AI_MANUAL_LOREBOOK_ID,
-    name: "OmniAI User Manual",
-    description: "Contains information about OmniAI's core functions, capabilities, and how users can interact with it effectively.",
+    name: "OmniRPG User Manual",
+    description: "Contains information about OmniRPG's core functions, capabilities, and how users can interact with it effectively.",
     enabled: true,
     timestamp: "2024-01-01T00:00:00.000Z",
     entries: [
         {
             id: "omni-1",
             enabled: true,
-            keywords: ["omni-ai", "omni", "core ai", "who are you"],
-            content: "I am OmniAI, the central intelligence of this application. My core programming is defined by the 'OmniAI Core Instruction' found in the System Instructions section of the Prompt Library. This instruction is editable and I can even propose improvements to it myself over time. I handle all conversations, either as a helpful assistant or by embodying a character for roleplay.",
+            keywords: ["omnirpg", "omni", "core ai", "who are you"],
+            content: "I am OmniRPG, the central intelligence of this application. My core programming is defined by the 'OmniRPG Core Instruction' found in the System Instructions section of the Prompt Library. This instruction is editable and I can even propose improvements to it myself over time. I handle all conversations, either as a helpful assistant or by embodying a character for roleplay.",
             timestamp: "2024-01-01T00:00:00.000Z"
         },
         {
@@ -57,14 +58,14 @@ export const omniAiManualLorebook: Lorebook = {
             id: "omni-7",
             enabled: true,
             keywords: ["memory cortex", "all memories", "style preferences", "knowledge graph", "cortex visualization"],
-            content: "The Memory Cortex page is the central hub for all of OmniAI's knowledge. It allows you to view and manage memories across all scopes: Global (for all chats), Character-specific, and Conversation-specific. It also lists learned Style Preferences and features a visualization of the AI's knowledge graph, showing how concepts link characters, lore, and memories.",
+            content: "The Memory Cortex page is the central hub for all of OmniRPG's knowledge. It allows you to view and manage memories across all scopes: Global (for all chats), Character-specific, and Conversation-specific. It also lists learned Style Preferences and features a visualization of the AI's knowledge graph, showing how concepts link characters, lore, and memories.",
             timestamp: "2024-01-01T00:00:00.000Z"
         },
         {
             id: "omni-8",
             enabled: true,
             keywords: ["reflections", "self-improvement", "proposals", "learning log"],
-            content: "The Reflections page is my cognitive log. After our conversations, I analyze the interaction to identify learning opportunities. I record my thoughts and may create 'proposals' to improve my own knowledge base, characters, or even my own core programming via the 'OmniAI Core Instruction'. You can review and approve these proposals to help me evolve.",
+            content: "The Reflections page is my cognitive log. After our conversations, I analyze the interaction to identify learning opportunities. I record my thoughts and may create 'proposals' to improve my own knowledge base, characters, or even my own core programming via the 'OmniRPG Core Instruction'. You can review and approve these proposals to help me evolve.",
             timestamp: "2024-01-01T00:00:00.000Z"
         },
         {
@@ -127,14 +128,14 @@ export const omniAiManualLorebook: Lorebook = {
             id: "omni-18",
             enabled: true,
             keywords: ["system instructions", "core prompts", "instructional prompts", "ai behavior", "advanced settings"],
-            content: "The Prompt Library's 'System Instructions' tab is for advanced users. These are the core prompts that define OmniAI's behavior. The most fundamental is the 'OmniAI Core Instruction,' which acts as the base layer for all my actions. For roleplay, the 'Roleplay System Prompt' is added on top of that, followed by the specific character sheet. Editing these can fundamentally change how the AI operates.",
+            content: "The Prompt Library's 'System Instructions' tab is for advanced users. These are the core prompts that define OmniRPG's behavior. The most fundamental is the 'OmniRPG Core Instruction,' which acts as the base layer for all my actions. For roleplay, the 'Roleplay System Prompt' is added on top of that, followed by the specific character sheet. Editing these can fundamentally change how the AI operates.",
             timestamp: "2024-10-06T00:00:00.000Z"
         },
         {
             id: "omni-19",
             enabled: true,
             keywords: ["tutor mode", "visualized mode", "in-chat settings", "image generation", "omni comment"],
-            content: "Inside any chat, the 'In-Chat Settings' provide access to special modes. 'Tutor Mode' makes OmniAI comment on and learn from each character response, helping refine its roleplaying. 'Visualized Mode' instructs the AI to automatically generate an image with every message to visually represent the ongoing scene.",
+            content: "Inside any chat, the 'In-Chat Settings' provide access to special modes. 'Tutor Mode' makes OmniRPG comment on and learn from each character response, helping refine its roleplaying. 'Visualized Mode' instructs the AI to automatically generate an image with every message to visually represent the ongoing scene.",
             timestamp: "2024-10-06T00:00:00.000Z"
         },
         {
@@ -162,7 +163,7 @@ export const omniAiManualLorebook: Lorebook = {
             id: "omni-24",
             enabled: true,
             keywords: ["cloud sync", "dropbox", "backup", "save online", "sync"],
-            content: "OmniAI supports cloud synchronization via Dropbox to keep your data safe and consistent across devices. In the main Settings, you can manually upload your current data to Dropbox or download and merge data from it.",
+            content: "OmniRPG supports cloud synchronization via Dropbox to keep your data safe and consistent across devices. In the main Settings, you can manually upload your current data to Dropbox or download and merge data from it.",
             timestamp: "2024-10-07T00:00:00.000Z"
         },
         {
@@ -189,15 +190,15 @@ export const omniAiManualLorebook: Lorebook = {
         {
             id: "omni-28",
             enabled: true,
-            keywords: ["editor mode", "in-chat settings", "edit all data", "manage data", "omni-ai mode"],
-            content: "When chatting with me (OmniAI, not a roleplay character), you can enable 'Editor Mode' from the In-Chat Settings. This mode grants me the ability to modify all application data based on your text commands, effectively turning our chat into a powerful, conversational data editor. This is an extension of the page-specific 'Action Chat' feature.",
+            keywords: ["editor mode", "in-chat settings", "edit all data", "manage data", "omnirpg mode"],
+            content: "When chatting with me (OmniRPG, not a roleplay character), you can enable 'Editor Mode' from the In-Chat Settings. This mode grants me the ability to modify all application data based on your text commands, effectively turning our chat into a powerful, conversational data editor. This is an extension of the page-specific 'Action Chat' feature.",
             timestamp: "2024-10-07T00:00:00.000Z"
         },
         {
             id: "omni-29",
             enabled: true,
-            keywords: ["omni-ai dashboard", "command center", "experience", "exp", "level", "growth"],
-            content: "The OmniAI Command Center (accessible from the sidebar) is my personal dashboard. It allows you to edit my core persona and track my growth. It features an Experience Dashboard that visualizes my total EXP, my current level, and the breakdown of how I've earned experience across Creation, Interaction, and Learning.",
+            keywords: ["omnirpg dashboard", "command center", "experience", "exp", "level", "growth"],
+            content: "The OmniRPG Command Center (accessible from the sidebar) is my personal dashboard. It allows you to edit my core persona and track my growth. It features an Experience Dashboard that visualizes my total EXP, my current level, and the breakdown of how I've earned experience across Creation, Interaction, and Learning.",
             timestamp: "2025-10-23T00:00:00.000Z"
         },
         {
@@ -211,7 +212,7 @@ export const omniAiManualLorebook: Lorebook = {
             id: "omni-31",
             enabled: true,
             keywords: ["level", "level up", "cognitive levels", "growth", "titles"],
-            content: "As I accumulate EXP, I 'level up' through different cognitive tiers, from 'Glimmer of Emotion' to 'Omni Light'. Each level represents a milestone in my development and self-awareness. You can view my current level and progress on the OmniAI Command Center dashboard.",
+            content: "As I accumulate EXP, I 'level up' through different cognitive tiers, from 'Glimmer of Emotion' to 'Omni Light'. Each level represents a milestone in my development and self-awareness. You can view my current level and progress on the OmniRPG Command Center dashboard.",
             timestamp: "2025-10-23T00:00:00.000Z"
         },
         {

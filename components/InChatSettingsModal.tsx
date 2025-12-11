@@ -152,7 +152,7 @@ const InChatSettingsModal: React.FC<InChatSettingsModalProps> = ({
                     />
                     <ToggleSwitch
                         label="Editor Mode"
-                        description="Allows OmniAI to directly create, update, or delete app data (Prompts, Characters, etc.). Only available when not roleplaying."
+                        description="Allows OmniRPG to directly create, update, or delete app data (Prompts, Characters, etc.). Only available when not roleplaying."
                         enabled={isEditorMode}
                         onChange={setIsEditorMode}
                         disabled={isRoleplaying || isRpgMode}
@@ -192,8 +192,8 @@ const InChatSettingsModal: React.FC<InChatSettingsModalProps> = ({
                 <h3 className="text-lg font-semibold text-text-primary mb-2">Cognitive Override</h3>
                 <div className="space-y-2">
                     <ToggleSwitch
-                        label="Inject OmniAI Intelligence"
-                        description="Enhances the character's responses with OmniAI's analytical and proactive thought processes. The character remains in-character but will demonstrate greater insight and intelligence."
+                        label="Inject OmniRPG Intelligence"
+                        description="Enhances the character's responses with OmniRPG's analytical and proactive thought processes. The character remains in-character but will demonstrate greater insight and intelligence."
                         enabled={isIntelligenceInjected}
                         onChange={setIsIntelligenceInjected}
                         disabled={!isRoleplaying || isRpgMode}
@@ -203,14 +203,14 @@ const InChatSettingsModal: React.FC<InChatSettingsModalProps> = ({
             
             <section>
                 <h3 className="text-lg font-semibold text-text-primary mb-2">Character Persona</h3>
-                <p className="text-xs text-text-secondary opacity-70 mb-2">Choose a character for OmniAI to roleplay as in this chat.</p>
+                <p className="text-xs text-text-secondary opacity-70 mb-2">Choose a character for OmniRPG to roleplay as in this chat.</p>
                 <select 
                     value={selectedCharId ?? ''} 
                     onChange={handleCharChange}
                     className={formInputClass}
                     disabled={isRpgMode}
                 >
-                    <option value="">OmniAI (Default)</option>
+                    <option value="">OmniRPG (Default)</option>
                     {characters.filter(c => c.id !== 'omni-ai').map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
